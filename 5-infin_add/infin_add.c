@@ -6,7 +6,7 @@
 /*   By: rjeraldi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/14 16:45:50 by rjeraldi          #+#    #+#             */
-/*   Updated: 2020/01/21 16:56:35 by rjeraldi         ###   ########.fr       */
+/*   Updated: 2020/01/21 22:17:05 by rjeraldi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,10 +71,9 @@ int			ft_iszerostr(char *str, int strlen)
 	return (1);
 }
 
-char		*infin_add(char *num1, char *num2, int num1len, int num2len, const int sign1in, const int sign2in)
+char		*infin_add(char *num1, char *num2, int num1len, int num2len, const int sign1in, const int sign2in, char *resrev)
 {
 	int		i;
-	char	*resrev;
 	int		sum;
 	int		sumsign;
 	int		sumincr;
@@ -92,46 +91,43 @@ char		*infin_add(char *num1, char *num2, int num1len, int num2len, const int sig
 		else if (sign2 == -1)
 			sign2 = 1;
 	}
-	if ((resrev = (char *)malloc(sizeof(char) * (num1len + 3))))
+	sumincr = 0;
+	i = 0;
+	while (i < num2len)
 	{
-		sumincr = 0;
-		i = 0;
-		while (i < num2len)
-		{
-			digit1 = sumincr + num1[i] - '0';
-			sum = digit1 + sign2 * (num2[i] - '0');
-			if (digit1 < 0 && (sum += 10))
-				sumincr = -1;
-			else
-				sumincr = sum / 10;
-			if (sign2 == -1 && digit1 < num2[i] - '0' && (sum += 10))
-				sumincr = -1;
-			resrev[i++] = sum % 10 + '0';
-		}
-		/* (123 - 124) -> (124 - 123)*/
-		if (num1len == num2len && sumincr < 0)
-			return (infin_add(num2, num1, num2len, num1len, sign2in, sign1in));
-		while (i < num1len)
-		{
-			digit1 = sumincr + num1[i] - '0';
-			if (digit1 < 0 && (digit1 += 10))
-				sumincr = -1;
-			else
-				sumincr = digit1 / 10;
-			resrev[i++] = digit1 % 10 + '0';
-		}
-		if (sumincr)
-			resrev[i++] = sumincr + '0';
-		/* cut last zeros */
-		while (i > 1 && resrev[i - 1] == '0')
-			i--;
-		/* fix -0 as return value */
-		if (ft_iszerostr(resrev, i) && (sumsign = 1))
-			i = 1;
-		if (sumsign < 0)
-			resrev[i++] = '-';
-		resrev[i] = '\0';
+		digit1 = sumincr + num1[i] - '0';
+		sum = digit1 + sign2 * (num2[i] - '0');
+		if (digit1 < 0 && (sum += 10))
+			sumincr = -1;
+		else
+			sumincr = sum / 10;
+		if (sign2 == -1 && digit1 < num2[i] - '0' && (sum += 10))
+			sumincr = -1;
+		resrev[i++] = sum % 10 + '0';
 	}
+	/* (123 - 124) -> (124 - 123)*/
+	if (num1len == num2len && sumincr < 0)
+		return (infin_add(num2, num1, num2len, num1len, sign2in, sign1in, resrev));
+	while (i < num1len)
+	{
+		digit1 = sumincr + num1[i] - '0';
+		if (digit1 < 0 && (digit1 += 10))
+			sumincr = -1;
+		else
+			sumincr = digit1 / 10;
+		resrev[i++] = digit1 % 10 + '0';
+	}
+	if (sumincr)
+		resrev[i++] = sumincr + '0';
+	/* cut last zeros */
+	while (i > 1 && resrev[i - 1] == '0')
+		i--;
+	/* fix -0 as return value */
+	if (ft_iszerostr(resrev, i) && (sumsign = 1))
+		i = 1;
+	if (sumsign < 0)
+		resrev[i++] = '-';
+	resrev[i] = '\0';
 	return (resrev);
 }
 
@@ -143,6 +139,7 @@ int			main(int argc, char **argv)
 	int		sign2;
 	char	*num1str;
 	char	*num2str;
+	char	*resrev;
 
 	if (argc == 3)
 	{
@@ -156,10 +153,14 @@ int			main(int argc, char **argv)
 			num2len = ft_strlen((num2str = *(argv + 2) + 1));
 		else
 			num2len = ft_strlen((num2str = *(argv + 2)));
-		if (num1len >= num2len)
-			ft_putstr(ft_strrev(infin_add(ft_strrev(num1str), ft_strrev(num2str), num1len, num2len, sign1, sign2)));
-		else
-			ft_putstr(ft_strrev(infin_add(ft_strrev(num2str), ft_strrev(num1str), num2len, num1len, sign2, sign1)));
+		if ((resrev = (char *)malloc(sizeof(char) * (num1len + 3))))
+		{
+			if (num1len >= num2len)
+				ft_putstr(ft_strrev(infin_add(ft_strrev(num1str), ft_strrev(num2str), num1len, num2len, sign1, sign2, resrev)));
+			else
+				ft_putstr(ft_strrev(infin_add(ft_strrev(num2str), ft_strrev(num1str), num2len, num1len, sign2, sign1, resrev)));
+			free(resrev);
+		}
 		ft_putchar('\n');
 	}
 	return (0);
