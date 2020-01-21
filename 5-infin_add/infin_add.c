@@ -6,7 +6,7 @@
 /*   By: rjeraldi <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/14 16:45:50 by rjeraldi          #+#    #+#             */
-/*   Updated: 2020/01/21 14:12:28 by rjeraldi         ###   ########.fr       */
+/*   Updated: 2020/01/21 16:56:35 by rjeraldi         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ char		*ft_strrev(char *str)
 			*(strrev + strlen - i) = *(str + i - 1);
 			i--;
 		}
-		*(strrev + strlen + 1) = '\0';
+		*(strrev + strlen) = '\0';
 	}
 	return (strrev);
 }
